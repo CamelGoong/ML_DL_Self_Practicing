@@ -1,0 +1,35 @@
+#05 시계열 분석: 전력 거래 가격 예측 모델
+
+#라이브러리 설정
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import seaborn as sns
+import random
+
+# 랜덤 시드 고정
+SEED = 12
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+# 구글 드라이브 폴더 마운트
+from google.colab import drive, files
+drive.mount('/gdrive')
+
+# 전력 거래서 전력 거래가격(SMP) 데이터 다운로드
+drive_path = "/gdrive/My Drive/Python_DeepLearning/"
+smp = pd.read_csv(drive_path + "smp/smp.csv")
+
+# 날짜 데이터를 time series 형식으로 변환
+smp['date'] = pd.to_datetime(smp["date"])
+smp['day_of_week'] = smp['date'].dt.dayofweek
+
+print(smp.shape)
+smp.head()
+
+# Onehot Encoding
+smp['day_of_week'] = smp['day_of_week'].astype('category')
+smp = pd.get_dummies(smp, columns = ['day_of_week'], prefix = 'W', drop_first=True)
+smp.head()
