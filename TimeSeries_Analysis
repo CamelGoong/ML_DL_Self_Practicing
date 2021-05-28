@@ -1,5 +1,7 @@
 #05 시계열 분석: 전력 거래 가격 예측 모델
 
+# 5-1 데이터 탐색
+
 #라이브러리 설정
 import pandas as pd
 import numpy as np
@@ -33,3 +35,44 @@ smp.head()
 smp['day_of_week'] = smp['day_of_week'].astype('category')
 smp = pd.get_dummies(smp, columns = ['day_of_week'], prefix = 'W', drop_first=True)
 smp.head()
+
+# 그래프 그리기
+fig, axes = plt.subplots(4, 1, figsize = (20, 20)) #4행1열의 섹터로 나누어진 그래프 그리기
+
+# 그래프 1
+axes[0].plot(smp['date'], smp['smp_max'])
+axes[0].set_title('smp_max')
+# 그래프 2
+axes[1].plot(smp['date'], smp['smp_mean'])
+axes[1].set_title('smp_mean')
+# 그래프 3
+axes[2].plot(smp['date'], smp['smp_min'])
+axes[2].set_title('smp_min')
+
+axes[3].plot(smp['date'], smp['smp_max'], label = 'smp_max')
+axes[3].plot(smp['date'], smp['smp_mean'], label = 'smp_mean')
+axes[3].plot(smp['date'], smp['smp_min'], label = 'smp_min')
+axes[3].set_title('SMP')
+axes[3].legend() #범례표시
+
+plt.show()
+
+# 5-2 데이터 전처리
+
+# Settings
+train_split_idx = 729 # 2020.1.1의 행 인덱스 번호
+window_size = 10 # 과거 10일 간의 시계열 데이터를 학습 데이터로 사용
+future = 3 # 3일 이후의 타깃 예측
+
+# features
+X_train = smp.iloc[:train_split_idx - window_size - future, 0:] # iloc()은 행 인덱스가 아니라, 행번호 기준으로 데이터 읽기
+
+# Tragets
+y_train = smp.iloc[window_size + future :train_split_idx, [3]] # 'smp_mean' 열 / 3열에 해당하는 smp_mean을 예측값으로 지정
+
+print(X_train.shape, y_train.shape)
+
+X_train.head(15)
+y_train.head(5)
+
+
