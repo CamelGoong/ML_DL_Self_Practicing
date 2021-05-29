@@ -75,4 +75,27 @@ print(X_train.shape, y_train.shape)
 X_train.head(15)
 y_train.head(5)
 
+# X_test
+test_start = train_split_idx - window_size - future # 테스트 데이터 시작 행
+test_end = smp.shape[0] - window_size - future
+X_test = smp.iloc[test_start:test_end, 0:]
 
+# y_test
+# label_start = + future # 테스트 데이터의 첫번째 타깃 데이터 위치
+y_test = smp.iloc[train_split_idx:, [3]]
+
+print(X_test.shape, y_test.shape)
+
+X_test.head(15)
+y_test.head(5)
+
+# Feature Scaling
+X_train_scaled = X_train.loc[:, 'smp_max':]
+X_test_scaled = X_test.loc[:, 'smp_max':]
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+
+scaler.fit(X_train_scaled.values)
+X_train_scaled.loc[:,:] = scaler.transform(X_train_scaled.values)
+X_test_scaled.loc[:,:] = scaler.transform(X_test_scaled.values)
